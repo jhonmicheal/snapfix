@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SnapFix Photo Diagnosis</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
+    img {
+      max-width: 100%;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>📸 Upload Garage Door Image</h2>
+  <input type="file" id="fileInput" />
+  <button onclick="uploadImage()">Upload & Diagnose</button>
+
+  <div id="result" style="margin-top: 30px;"></div>
+
+  <script>
+    async function uploadImage() {
+      const fileInput = document.getElementById("fileInput");
+      const resultDiv = document.getElementById("result");
+
+      if (!fileInput.files[0]) {
+        alert("Please select an image.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("photo", fileInput.files[0]);
+
+      resultDiv.innerHTML = "Uploading...";
+
+      try {
+        const res = await fetch("https://snapfix-api.onrender.com/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+
+        resultDiv.innerHTML = `
+          <img src="${data.url}" alt="Uploaded image" />
+          <h3>Issue: ${data.issue}</h3>
+          <p>Estimated Cost: ${data.cost}</p>
+        `;
+      } catch (error) {
+        console.error("Upload failed:", error);
+        resultDiv.innerHTML = "❌ Upload failed. Please try again.";
+      }
+    }
+  </script>
+</body>
+</html>
